@@ -5,6 +5,7 @@ A way to simulate the Monty Hall problem and see statistical results
 Setup golang
 
 `build` for an .exe
+
 `run` to see results in terminal
 
 # Side Notes:
