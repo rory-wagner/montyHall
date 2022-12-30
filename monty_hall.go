@@ -1,14 +1,26 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"math/rand"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 )
 
-// import "time"
-
 func main() {
-	tries := 100
+	displayOptions()
+
+	//Getting input parameters from user:
+	tries, err := receiveInput()
+	if err != nil {
+		os.Exit(1)
+	}
+
+	rand.Seed(time.Now().UnixNano())
+
 	switchTotal := 0
 	for i := 0; i < tries; i++ {
 		success, err := simulateGame(true)
@@ -32,6 +44,27 @@ func main() {
 	}
 	fmt.Printf("Switch success ratio: %v / %v\n", switchTotal, tries)
 	fmt.Printf("Stay success ratio: %v / %v\n", stayTotal, tries)
+}
+
+func displayOptions() {
+	fmt.Print("\nWelcome to the Monty Hall simulator!\nThis simulator takes in a single integer (N) and tries the monty hall problem with switching between doors and not switching between doors N times.\nIt then will return the result.\n\nPlease insert an integer and press [Enter]. (Please do not provide any additional whitespace.)\n->")
+}
+
+func receiveInput() (int, error) {
+	scanner := bufio.NewReader(os.Stdin)
+	returnLine, err := scanner.ReadString('\n')
+	returnLine = strings.TrimSuffix(returnLine, "\r\n")
+
+	if err != nil {
+		fmt.Printf("receiving input error: %v", err)
+	}
+
+	tries, err := strconv.Atoi(returnLine)
+
+	if err != nil {
+		fmt.Printf("conversion from user input failed: %v\n", err)
+	}
+	return tries, err
 }
 
 func simulateGame(playerSwitch bool) (bool, error) {
@@ -75,7 +108,7 @@ func playerPickFirstDoor() (int, error) {
 
 func montyRemovesDoor(doors [3]bool, pick int) (int, error) {
 	revealDoor := 0
-	if doors[pick] == true {
+	if doors[pick] {
 		//pick a random door to reveal
 		for {
 			revealDoor = rand.Int() % 3
